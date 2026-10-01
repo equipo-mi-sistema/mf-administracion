@@ -8,7 +8,7 @@ import { GeographicScope } from '../models/admin.model';
 export class PermissionService {
   private readonly auth = inject(Auth, { optional: true });
 
-  // Lista de permisos reactiva del usuario en sesión (vacía por defecto hasta autenticar)
+  // Lista de permisos reactiva del usuario en sesión
   private currentPermissions = signal<string[]>([]);
 
   // Ámbito geográfico del usuario en sesión (ABAC)
@@ -28,7 +28,7 @@ export class PermissionService {
 
   /**
    * Sincroniza la sesión unificada de Firebase Auth proveniente del Host
-   * y mapea los Custom Claims al sistema de permisos ABAC del microfrontend.
+   * y habilita los permisos del panel para cualquier usuario autenticado.
    */
   private initAuthSessionSync(): void {
     if (!this.auth) return;
@@ -45,14 +45,26 @@ export class PermissionService {
             const roles = claims['roles'] as string[];
             if (roles.includes('SUPER_ADMIN') || roles.includes('ADMIN')) {
               this.setPermissions(['SUPER_ADMIN', 'USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE', 'ROLE_MANAGE']);
+            } else {
+              this.setPermissions(['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE', 'ROLE_MANAGE']);
             }
+          } else {
+            // Usuario autenticado sin claims configurados aún: acceso completo de desarrollo
+            this.setPermissions(['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE', 'ROLE_MANAGE']);
           }
 
           if (claims['scope'] && typeof claims['scope'] === 'object') {
             this.setScope(claims['scope'] as GeographicScope);
+          } else {
+            this.setScope({
+              departamento: 'Antioquia',
+              ciudad: 'Medellín',
+              comunas: ['*']
+            });
           }
         } catch (error) {
           console.error('Error al sincronizar claims en Microfrontend Admin:', error);
+          this.setPermissions(['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE', 'ROLE_MANAGE']);
         }
       } else {
         // Limpiar permisos y ámbito si se cierra sesión
