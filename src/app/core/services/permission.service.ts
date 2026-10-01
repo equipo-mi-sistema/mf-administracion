@@ -1,10 +1,13 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Auth, onAuthStateChanged, getIdTokenResult } from '@angular/fire/auth';
 import { GeographicScope } from '../models/admin.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PermissionService {
+  private readonly auth = inject(Auth, { optional: true });
+
   // Lista de permisos reactiva del usuario en sesión
   private currentPermissions = signal<string[]>([
     'USER_VIEW',
@@ -24,6 +27,42 @@ export class PermissionService {
   // Lectura pública sólo de lectura
   readonly permissions = this.currentPermissions.asReadonly();
   readonly scope = this.currentScope.asReadonly();
+
+  constructor() {
+    this.initAuthSessionSync();
+  }
+
+  /**
+   * Sincroniza la sesión unificada de Firebase Auth proveniente del Host
+   * y mapea los Custom Claims al sistema de permisos ABAC del microfrontend.
+   */
+  private initAuthSessionSync(): void {
+    if (!this.auth) return;
+
+    onAuthStateChanged(this.auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const tokenResult = await getIdTokenResult(firebaseUser, false);
+          const claims = tokenResult.claims;
+
+          if (claims['permissions'] && Array.isArray(claims['permissions'])) {
+            this.setPermissions(claims['permissions'] as string[]);
+          } else if (claims['roles'] && Array.isArray(claims['roles'])) {
+            const roles = claims['roles'] as string[];
+            if (roles.includes('SUPER_ADMIN') || roles.includes('ADMIN')) {
+              this.setPermissions(['SUPER_ADMIN', 'USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE', 'ROLE_MANAGE']);
+            }
+          }
+
+          if (claims['scope'] && typeof claims['scope'] === 'object') {
+            this.setScope(claims['scope'] as GeographicScope);
+          }
+        } catch (error) {
+          console.error('Error al sincronizar claims en Microfrontend Admin:', error);
+        }
+      }
+    });
+  }
 
   // Permite al Host o al Login actualizar los permisos
   setPermissions(perms: string[]) {
