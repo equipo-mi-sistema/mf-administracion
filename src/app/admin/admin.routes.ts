@@ -2,11 +2,13 @@ import { Routes } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { RoleManagementComponent } from './components/role-management/role-management.component';
+import { adminAuthGuard } from '../core/guards/admin-auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
+    canActivate: [adminAuthGuard],
     children: [
       {
         path: '',

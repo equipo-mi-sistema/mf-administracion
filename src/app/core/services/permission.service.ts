@@ -8,20 +8,14 @@ import { GeographicScope } from '../models/admin.model';
 export class PermissionService {
   private readonly auth = inject(Auth, { optional: true });
 
-  // Lista de permisos reactiva del usuario en sesión
-  private currentPermissions = signal<string[]>([
-    'USER_VIEW',
-    'USER_CREATE',
-    'USER_EDIT',
-    'USER_DELETE',
-    'ROLE_MANAGE'
-  ]);
+  // Lista de permisos reactiva del usuario en sesión (vacía por defecto hasta autenticar)
+  private currentPermissions = signal<string[]>([]);
 
   // Ámbito geográfico del usuario en sesión (ABAC)
   private currentScope = signal<GeographicScope>({
-    departamento: 'Antioquia',
-    ciudad: 'Medellín',
-    comunas: ['*']
+    departamento: '',
+    ciudad: '',
+    comunas: []
   });
 
   // Lectura pública sólo de lectura
@@ -60,6 +54,14 @@ export class PermissionService {
         } catch (error) {
           console.error('Error al sincronizar claims en Microfrontend Admin:', error);
         }
+      } else {
+        // Limpiar permisos y ámbito si se cierra sesión
+        this.setPermissions([]);
+        this.setScope({
+          departamento: '',
+          ciudad: '',
+          comunas: []
+        });
       }
     });
   }
