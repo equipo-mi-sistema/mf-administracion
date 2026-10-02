@@ -1,0 +1,101 @@
+<nav class="space-y-1" role="navigation" aria-label="Menú principal">
+  @for (item of items(); track getItemKey(item, $index)) {
+    <div class="relative">
+      <!-- Opción con submenú -->
+      @if (hasChildren(item)) {
+        <button
+          type="button"
+          (click)="toggleSubmenu(item, $event)"
+          [title]="item.label"
+          [attr.aria-expanded]="isExpanded(item)"
+          [class]="isChildActive(item) ? 'bg-brand-50/70 text-brand-800 font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+          class="group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all select-none focus:outline-none cursor-pointer"
+        >
+          <span
+            class="flex-shrink-0 transition-colors"
+            [class.text-brand-600]="isChildActive(item)"
+            [class.text-slate-500]="!isChildActive(item)"
+            [class.group-hover:text-brand-600]="!isChildActive(item)"
+          >
+            <app-icon [name]="item.icon || 'dashboard'" size="md"></app-icon>
+          </span>
+
+          @if (!collapsed()) {
+            <span class="ml-3 flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis">
+              {{ item.label }}
+            </span>
+
+            @if (item.badge) {
+              <app-badge [variant]="item.badgeVariant || 'brand'" size="sm" class="mr-2">
+                {{ item.badge }}
+              </app-badge>
+            }
+
+            <span
+              class="flex-shrink-0 text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
+              [class.rotate-90]="isExpanded(item)"
+            >
+              <app-icon name="chevron-right" size="sm"></app-icon>
+            </span>
+          }
+        </button>
+
+        <!-- Contenedor del Submenú desplegable -->
+        @if (!collapsed() && isExpanded(item)) {
+          <div class="mt-1 ml-4 pl-3 border-l-2 border-slate-200 space-y-1 py-0.5">
+            @for (subItem of item.children; track getItemKey(subItem, $index)) {
+              <a
+                [routerLink]="subItem.route"
+                routerLinkActive="bg-brand-50 text-brand-700 font-semibold"
+                [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }"
+                (click)="handleItemClick(subItem)"
+                class="group flex items-center rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+                [title]="subItem.label"
+              >
+                @if (subItem.icon) {
+                  <span class="mr-2 text-slate-400 group-hover:text-brand-600 transition-colors">
+                    <app-icon [name]="subItem.icon" size="sm"></app-icon>
+                  </span>
+                } @else {
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-brand-500 mr-2.5 transition-colors"></span>
+                }
+
+                <span class="flex-1 whitespace-nowrap overflow-hidden text-ellipsis">{{ subItem.label }}</span>
+
+                @if (subItem.badge) {
+                  <app-badge [variant]="subItem.badgeVariant || 'brand'" size="sm" class="ml-auto">
+                    {{ subItem.badge }}
+                  </app-badge>
+                }
+              </a>
+            }
+          </div>
+        }
+      } @else {
+        <!-- Opción directa sin submenú -->
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-brand-50 text-brand-700 font-semibold"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          class="group flex items-center rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all select-none cursor-pointer"
+          [title]="item.label"
+          (click)="handleItemClick(item)"
+        >
+          <span class="flex-shrink-0 text-slate-500 group-hover:text-brand-600 transition-colors">
+            <app-icon [name]="item.icon || 'dashboard'" size="md"></app-icon>
+          </span>
+
+          @if (!collapsed()) {
+            <span class="ml-3 flex-1 whitespace-nowrap overflow-hidden text-ellipsis">{{ item.label }}</span>
+
+            @if (item.badge) {
+              <app-badge [variant]="item.badgeVariant || 'brand'" size="sm" class="ml-auto">
+                {{ item.badge }}
+              </app-badge>
+            }
+          }
+        </a>
+      }
+    </div>
+  }
+</nav>
