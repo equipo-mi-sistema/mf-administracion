@@ -1,15 +1,23 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, forwardRef, input, model, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-checkbox',
   standalone: true,
   imports: [CommonModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => CheckboxComponent),
+      multi: true
+    }
+  ],
   template: `
     <label
-      [class.opacity-60]="disabled()"
-      [class.cursor-not-allowed]="disabled()"
-      [class.cursor-pointer]="!disabled()"
+      [class.opacity-60]="effectiveDisabled()"
+      [class.cursor-not-allowed]="effectiveDisabled()"
+      [class.cursor-pointer]="!effectiveDisabled()"
       class="inline-flex items-start gap-3 select-none group"
     >
       <div class="relative flex items-center justify-center mt-0.5">
@@ -17,8 +25,9 @@ import { CommonModule } from '@angular/common';
           type="checkbox"
           [id]="id()"
           [checked]="checked()"
-          [disabled]="disabled()"
+          [disabled]="effectiveDisabled()"
           (change)="onToggle($event)"
+          (blur)="onBlur()"
           class="sr-only"
         />
 
@@ -52,7 +61,7 @@ import { CommonModule } from '@angular/common';
     </label>
   `
 })
-export class CheckboxComponent {
+export class CheckboxComponent implements ControlValueAccessor {
   checked = model<boolean>(false);
   label = input<string>('');
   description = input<string>('');
@@ -62,6 +71,12 @@ export class CheckboxComponent {
   id = input<string>('');
 
   changed = output<boolean>();
+
+  private cvaDisabled = signal<boolean>(false);
+  private onChange: (val: any) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  effectiveDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
   boxClasses = computed(() => {
     const base = 'h-5 w-5 rounded-md border flex items-center justify-center transition-all duration-150';
@@ -77,10 +92,31 @@ export class CheckboxComponent {
     return `${base} border-slate-300 bg-white group-hover:border-slate-400 group-focus-within:ring-2 group-focus-within:ring-brand-200`;
   });
 
+  writeValue(val: any): void {
+    this.checked.set(!!val);
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+
   onToggle(event: Event): void {
-    if (this.disabled()) return;
+    if (this.effectiveDisabled()) return;
     const target = event.target as HTMLInputElement;
     this.checked.set(target.checked);
+    this.onChange(target.checked);
     this.changed.emit(target.checked);
+  }
+
+  onBlur(): void {
+    this.onTouched();
   }
 }

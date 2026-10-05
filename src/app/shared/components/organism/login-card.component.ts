@@ -1,8 +1,8 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoginHeaderComponent } from '../../../shared/components/molecules/login-header.component';
-import { SecurityDisclaimerComponent } from '../../../shared/components/molecules/security-disclaimer.component';
-import { GoogleButtonComponent } from '../../../shared/components/atomics/google-button.component';
+import { LoginHeaderComponent } from '../molecules/login-header.component';
+import { SecurityDisclaimerComponent } from '../molecules/security-disclaimer.component';
+import { GoogleButtonComponent } from '../atomics/google-button.component';
 
 @Component({
   selector: 'app-login-card',

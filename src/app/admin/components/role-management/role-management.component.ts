@@ -5,11 +5,37 @@ import { RouterModule } from '@angular/router';
 import { RoleService } from '../../../core/services/role.service';
 import { Role, Permission, PermissionModule } from '../../../core/models/admin.model';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
+import {
+  BadgeComponent,
+  ButtonComponent,
+  CheckboxComponent,
+  IconComponent,
+  InputComponent,
+  TextareaComponent
+} from '../../../shared/components/atomics';
+import {
+  EmptyStateCardComponent,
+  ModalComponent
+} from '../../../shared/components/organism';
+import { ToastService } from '../../../shared/components/organism/toast';
 
 @Component({
   selector: 'app-role-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HasPermissionDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    HasPermissionDirective,
+    ButtonComponent,
+    IconComponent,
+    BadgeComponent,
+    CheckboxComponent,
+    InputComponent,
+    TextareaComponent,
+    ModalComponent,
+    EmptyStateCardComponent
+  ],
   template: `
     <div class="space-y-6">
       <!-- Encabezado -->
@@ -17,36 +43,32 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Gestión de Roles y Permisos Atómicos</h1>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
-              RBAC Matriz
-            </span>
+            <app-badge variant="brand" size="sm">RBAC Matriz</app-badge>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
             Configura roles y asigna facultades atómicas para restringir o habilitar acciones en la plataforma.
           </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
           <!-- Regresar a Usuarios -->
-          <a 
-            routerLink="../users" 
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Volver a Usuarios</span>
+          <a routerLink="../users">
+            <app-button variant="outline" size="sm">
+              <app-icon name="arrow-left" size="sm"></app-icon>
+              <span>Volver a Usuarios</span>
+            </app-button>
           </a>
 
           <!-- Botón Nuevo Rol -->
-          <button 
+          <app-button 
             *hasPermission="'ROLE_MANAGE'"
-            (click)="openNewRoleDialog()" 
-            class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-500/20 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+            variant="primary" 
+            size="sm"
+            (clicked)="openNewRoleDialog()"
+          >
+            <app-icon name="plus" size="sm"></app-icon>
             <span>Nuevo Rol</span>
-          </button>
+          </app-button>
         </div>
       </div>
 
@@ -55,26 +77,28 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
         
         <!-- Columna Izquierda: Roles -->
         <div class="md:col-span-4 space-y-3">
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center justify-between">
-              <span>Roles Disponibles</span>
-              <span class="text-slate-400 font-normal">{{ roles.length }} registrados</span>
-            </h2>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-card">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Roles Disponibles</span>
+              <app-badge variant="neutral" size="sm">{{ roles.length }} registrados</app-badge>
+            </div>
 
             <div class="space-y-2">
               <div 
                 *ngFor="let r of roles" 
                 (click)="selectRole(r)"
                 [class.border-brand-500]="selectedRole?.id === r.id"
-                [class.bg-brand-50/50]="selectedRole?.id === r.id"
-                class="p-3 border rounded-xl cursor-pointer hover:border-slate-300 hover:bg-slate-50 transition group">
-                <div class="flex items-start justify-between">
-                  <div class="font-bold text-slate-800 text-sm group-hover:text-brand-700 transition">
+                [class.bg-brand-50/40]="selectedRole?.id === r.id"
+                [class.ring-2]="selectedRole?.id === r.id"
+                [class.ring-brand-500/20]="selectedRole?.id === r.id"
+                class="p-3.5 border border-slate-200/90 rounded-xl cursor-pointer hover:border-slate-300 hover:bg-slate-50/80 transition-all duration-fast group">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-bold text-slate-800 text-sm group-hover:text-brand-700 transition-colors">
                     {{ r.nombre }}
                   </div>
-                  <span *ngIf="r.esSistema" class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">
+                  <app-badge *ngIf="r.esSistema" variant="neutral" size="sm">
                     Sistema
-                  </span>
+                  </app-badge>
                 </div>
                 <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{{ r.descripcion }}</p>
                 <div class="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-brand-600">
@@ -88,67 +112,67 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
 
         <!-- Columna Derecha: Matriz de Permisos Atómicos -->
         <div class="md:col-span-8">
-          <div *ngIf="selectedRole; else noRoleSelected" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+          <div *ngIf="selectedRole; else noRoleSelected" class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-card space-y-6">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
               <div>
                 <div class="flex items-center gap-2">
                   <h3 class="text-base font-bold text-slate-900">Permisos para: {{ selectedRole.nombre }}</h3>
-                  <span *ngIf="isChanged()" class="px-2 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700 font-semibold border border-amber-200">
+                  <app-badge *ngIf="isChanged()" variant="warning" size="sm" [dot]="true">
                     Cambios sin guardar
-                  </span>
+                  </app-badge>
                 </div>
                 <p class="text-xs text-slate-500 mt-0.5">{{ selectedRole.descripcion }}</p>
               </div>
 
               <div class="flex items-center gap-2">
-                <button 
-                  type="button" 
-                  (click)="toggleAllPermissions()" 
-                  class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition font-medium border border-slate-200">
-                  {{ allSelected() ? 'Desmarcar Todos' : 'Marcar Todos' }}
-                </button>
+                <app-button 
+                  variant="outline" 
+                  size="sm"
+                  (clicked)="toggleAllPermissions()"
+                >
+                  <span>{{ allSelected() ? 'Desmarcar Todos' : 'Marcar Todos' }}</span>
+                </app-button>
 
-                <button 
+                <app-button 
                   *hasPermission="'ROLE_MANAGE'"
-                  (click)="savePermissions()" 
+                  variant="primary" 
+                  size="sm"
                   [disabled]="!isChanged()"
-                  class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-40 rounded-lg shadow-sm shadow-brand-500/20 transition flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  (clicked)="savePermissions()"
+                >
+                  <app-icon name="check" size="sm"></app-icon>
                   <span>Guardar Cambios</span>
-                </button>
+                </app-button>
               </div>
             </div>
 
             <!-- Permisos agrupados por Módulo -->
-            <div class="space-y-5">
-              <div *ngFor="let group of groupedPermissions" class="space-y-2">
+            <div class="space-y-6">
+              <div *ngFor="let group of groupedPermissions" class="space-y-3">
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Módulo {{ group.modulo }}</span>
                   <div class="h-px flex-1 bg-slate-100"></div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label 
+                  <div 
                     *ngFor="let p of group.permisos" 
                     [class.border-brand-500]="isPermChecked(p.codigo)"
-                    [class.bg-brand-50/20]="isPermChecked(p.codigo)"
-                    class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition">
-                    <input 
-                      type="checkbox" 
+                    [class.bg-brand-50/25]="isPermChecked(p.codigo)"
+                    class="flex items-start gap-3 p-3.5 border border-slate-200/90 rounded-xl transition-all duration-fast hover:bg-slate-50/80">
+                    <app-checkbox 
                       [checked]="isPermChecked(p.codigo)" 
-                      (change)="togglePermission(p.codigo)" 
-                      class="mt-1 h-4 w-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
-                    <div class="flex-1">
-                      <div class="flex items-center justify-between">
+                      (changed)="togglePermission(p.codigo)"
+                    ></app-checkbox>
+                    <div class="flex-1 min-w-0" (click)="togglePermission(p.codigo)">
+                      <div class="flex items-center justify-between gap-1.5 cursor-pointer">
                         <span class="text-xs font-bold text-slate-800">{{ p.nombre }}</span>
                         <code class="text-[10px] text-slate-500 bg-slate-100 px-1 py-0.5 rounded font-mono">{{ p.codigo }}</code>
                       </div>
-                      <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{{ p.descripcion }}</p>
+                      <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed cursor-pointer">{{ p.descripcion }}</p>
                     </div>
-                  </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -156,47 +180,71 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
           </div>
 
           <ng-template #noRoleSelected>
-            <div class="bg-white p-12 rounded-xl border border-slate-200 shadow-sm text-center text-slate-400">
-              <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <p class="text-sm font-semibold text-slate-600">Selecciona un rol a la izquierda</p>
-              <p class="text-xs text-slate-400 mt-1">Podrás inspeccionar y configurar en detalle las autorizaciones atómicas asociadas.</p>
-            </div>
+            <app-empty-state-card
+              iconName="info"
+              title="Selecciona un rol a la izquierda"
+              description="Podrás inspeccionar y configurar en detalle las autorizaciones atómicas asociadas."
+            ></app-empty-state-card>
           </ng-template>
         </div>
 
       </div>
 
-      <!-- Diálogo Crear Nuevo Rol Simple -->
-      <div *ngIf="showNewRoleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
-          <h3 class="text-base font-bold text-slate-900 mb-1">Crear Nuevo Rol</h3>
-          <p class="text-xs text-slate-500 mb-4">Define el nombre y la descripción para el nuevo rol de usuario.</p>
+      <!-- Diálogo Crear Nuevo Rol Reutilizando ModalComponent -->
+      <app-modal
+        [(isOpen)]="showNewRoleModal"
+        title="Crear Nuevo Rol"
+        size="md"
+        (closed)="showNewRoleModal = false"
+      >
+        <p class="text-xs text-slate-500 -mt-2 mb-4">Define el nombre y la descripción para el nuevo rol de usuario.</p>
 
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Rol</label>
-              <input type="text" [(ngModel)]="newRoleName" placeholder="Ej: Supervisor Comunal" class="w-full px-3 py-2 text-xs border rounded-lg outline-none focus:border-brand-500">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción</label>
-              <textarea [(ngModel)]="newRoleDesc" rows="3" placeholder="Responsabilidades asignadas..." class="w-full px-3 py-2 text-xs border rounded-lg outline-none focus:border-brand-500"></textarea>
-            </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Rol *</label>
+            <app-input 
+              [(value)]="newRoleName" 
+              placeholder="Ej: Supervisor Comunal" 
+              size="sm"
+            ></app-input>
           </div>
 
-          <div class="flex justify-end gap-2 mt-5">
-            <button (click)="showNewRoleModal = false" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-            <button (click)="confirmCreateRole()" [disabled]="!newRoleName.trim()" class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 rounded-lg shadow-sm">Crear</button>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción</label>
+            <app-textarea 
+              [(value)]="newRoleDesc" 
+              [rows]="3" 
+              placeholder="Responsabilidades asignadas al rol..."
+            ></app-textarea>
           </div>
         </div>
-      </div>
+
+        <div modal-footer class="flex items-center justify-end gap-2.5 w-full">
+          <app-button 
+            variant="ghost" 
+            size="sm" 
+            (clicked)="showNewRoleModal = false"
+          >
+            <span>Cancelar</span>
+          </app-button>
+
+          <app-button 
+            variant="primary" 
+            size="sm" 
+            [disabled]="!newRoleName.trim()" 
+            (clicked)="confirmCreateRole()"
+          >
+            <span>Crear Rol</span>
+          </app-button>
+        </div>
+      </app-modal>
 
     </div>
   `
 })
 export class RoleManagementComponent implements OnInit {
   private roleService = inject(RoleService);
+  private toastService = inject(ToastService);
 
   roles: Role[] = [];
   permissions: Permission[] = [];
@@ -275,11 +323,15 @@ export class RoleManagementComponent implements OnInit {
 
   async savePermissions() {
     if (this.selectedRole?.id) {
-      await this.roleService.updateRole(this.selectedRole.id, {
-        permisos: this.activePermCodes
-      });
-      this.selectedRole.permisos = [...this.activePermCodes];
-      alert('Matriz de permisos actualizada con éxito.');
+      try {
+        await this.roleService.updateRole(this.selectedRole.id, {
+          permisos: this.activePermCodes
+        });
+        this.selectedRole.permisos = [...this.activePermCodes];
+        this.toastService.success('Matriz actualizada', `Se guardaron los permisos para ${this.selectedRole.nombre}.`);
+      } catch {
+        this.toastService.error('Error', 'No fue posible actualizar los permisos.');
+      }
     }
   }
 
@@ -291,13 +343,19 @@ export class RoleManagementComponent implements OnInit {
 
   async confirmCreateRole() {
     if (!this.newRoleName.trim()) return;
-    const newId = await this.roleService.createRole({
-      nombre: this.newRoleName.trim(),
-      descripcion: this.newRoleDesc.trim(),
-      permisos: ['USER_VIEW'],
-      esSistema: false
-    });
-    this.showNewRoleModal = false;
-    this.loadData();
+    try {
+      await this.roleService.createRole({
+        nombre: this.newRoleName.trim(),
+        descripcion: this.newRoleDesc.trim(),
+        permisos: ['USER_VIEW'],
+        esSistema: false
+      });
+      const createdName = this.newRoleName.trim();
+      this.showNewRoleModal = false;
+      this.toastService.success('Rol creado', `El rol "${createdName}" ha sido creado con éxito.`);
+      this.loadData();
+    } catch {
+      this.toastService.error('Error', 'No fue posible crear el nuevo rol.');
+    }
   }
 }

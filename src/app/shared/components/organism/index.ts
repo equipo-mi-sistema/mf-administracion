@@ -7,3 +7,6 @@ export * from './data-table';
 export * from './toast';
 export * from './drawer';
 export * from './file-upload';
+export * from './auth-layout.template';
+export * from './login-card.component';
+export * from './login-page.component';

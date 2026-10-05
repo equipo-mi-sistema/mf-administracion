@@ -6,11 +6,46 @@ import { UserService } from '../../../core/services/user.service';
 import { User, UserFilter } from '../../../core/models/admin.model';
 import { UserFormModalComponent } from '../user-form-modal/user-form-modal.component';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
+import {
+  AvatarComponent,
+  BadgeComponent,
+  BadgeVariant,
+  ButtonComponent,
+  IconComponent,
+  InputComponent
+} from '../../../shared/components/atomics';
+import {
+  SearchInputComponent,
+  SelectComponent,
+  SelectOption,
+  StatCardComponent
+} from '../../../shared/components/molecules';
+import {
+  ConfirmModalComponent,
+  EmptyStateCardComponent
+} from '../../../shared/components/organism';
+import { ToastService } from '../../../shared/components/organism/toast';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, UserFormModalComponent, HasPermissionDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    UserFormModalComponent,
+    HasPermissionDirective,
+    ButtonComponent,
+    IconComponent,
+    BadgeComponent,
+    AvatarComponent,
+    InputComponent,
+    SearchInputComponent,
+    SelectComponent,
+    StatCardComponent,
+    EmptyStateCardComponent,
+    ConfirmModalComponent
+  ],
   template: `
     <div class="space-y-6">
       
@@ -19,232 +54,247 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Directorio de Usuarios</h1>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
-              ABAC & RBAC
-            </span>
+            <app-badge variant="brand" size="sm">ABAC & RBAC</app-badge>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
             Gestión de identidades centralizadas, asignación de roles y delimitación de alcance territorial.
           </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
           <!-- Botón de Enlace a Roles -->
-          <a 
-            routerLink="../roles" 
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span>Matriz de Roles</span>
+          <a routerLink="../roles">
+            <app-button variant="outline" size="sm">
+              <app-icon name="shield" size="sm"></app-icon>
+              <span>Matriz de Roles</span>
+            </app-button>
           </a>
 
           <!-- Botón Crear Usuario (Guarded by *hasPermission) -->
-          <button 
+          <app-button 
             *hasPermission="'USER_CREATE'"
-            (click)="openCreateModal()" 
-            class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-500/20 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+            variant="primary" 
+            size="sm"
+            (clicked)="openCreateModal()"
+          >
+            <app-icon name="plus" size="sm"></app-icon>
             <span>Nuevo Usuario</span>
-          </button>
+          </app-button>
         </div>
       </div>
 
-      <!-- Tarjetas de Métricas Rápidas -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-          <span class="text-xs font-medium text-slate-500">Total Usuarios</span>
-          <div class="text-2xl font-bold text-slate-900 mt-1">{{ users.length }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-          <span class="text-xs font-medium text-slate-500">Activos</span>
-          <div class="text-2xl font-bold text-emerald-600 mt-1">{{ countByState('ACTIVO') }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-          <span class="text-xs font-medium text-slate-500">Inactivos</span>
-          <div class="text-2xl font-bold text-amber-600 mt-1">{{ countByState('INACTIVO') }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-          <span class="text-xs font-medium text-slate-500">Bloqueados</span>
-          <div class="text-2xl font-bold text-rose-600 mt-1">{{ countByState('BLOQUEADO') }}</div>
-        </div>
+      <!-- Tarjetas de Métricas Rápidas Reutilizando StatCardComponent -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <app-stat-card
+          title="Total Usuarios"
+          description="Identidades registradas en el sistema"
+          [badgeText]="users.length.toString()"
+          badgeVariant="neutral"
+          iconName="users"
+          iconColorClass="bg-brand-50 text-brand-600"
+        ></app-stat-card>
+
+        <app-stat-card
+          title="Usuarios Activos"
+          description="Con acceso operativo concedido"
+          [badgeText]="countByState('ACTIVO').toString()"
+          badgeVariant="success"
+          iconName="check"
+          iconColorClass="bg-emerald-50 text-emerald-600"
+        ></app-stat-card>
+
+        <app-stat-card
+          title="Usuarios Inactivos"
+          description="Acceso en pausa o suspendido"
+          [badgeText]="countByState('INACTIVO').toString()"
+          badgeVariant="warning"
+          iconName="warning"
+          iconColorClass="bg-amber-50 text-amber-600"
+        ></app-stat-card>
+
+        <app-stat-card
+          title="Bloqueados"
+          description="Restringidos por políticas o seguridad"
+          [badgeText]="countByState('BLOQUEADO').toString()"
+          badgeVariant="danger"
+          iconName="close"
+          iconColorClass="bg-rose-50 text-rose-600"
+        ></app-stat-card>
       </div>
 
-      <!-- Panel de Filtros Interactivos (Ciudad, Comuna, Estado, Búsqueda) -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+      <!-- Panel de Filtros Interactivos (Búsqueda, Ciudad, Comuna, Estado) -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-card space-y-4">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Filtros de Búsqueda</span>
-          <button 
+          <div class="flex items-center gap-2">
+            <app-icon name="search" size="sm" class="text-brand-600"></app-icon>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Filtros de Búsqueda</span>
+          </div>
+          <app-button
             *ngIf="hasActiveFilters()" 
-            (click)="resetFilters()" 
-            class="text-xs text-brand-600 hover:text-brand-800 font-medium">
-            Limpiar Filtros
-          </button>
+            variant="ghost" 
+            size="sm"
+            (clicked)="resetFilters()"
+          >
+            <span>Limpiar Filtros</span>
+          </app-button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <!-- Búsqueda por Nombre / Correo -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Buscar</label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [(ngModel)]="filters.search" 
-                (ngModelChange)="applyFilters()" 
-                placeholder="Nombre o correo..." 
-                class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
-              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+            <app-search-input 
+              [value]="filters.search || ''"
+              (search)="onSearchChange($event)"
+              placeholder="Nombre o correo..." 
+              size="sm"
+            ></app-search-input>
           </div>
 
           <!-- Filtro por Ciudad -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Ciudad</label>
-            <input 
-              type="text" 
-              [(ngModel)]="filters.ciudad" 
-              (ngModelChange)="applyFilters()" 
+            <app-input 
+              [value]="filters.ciudad || ''" 
+              (inputChange)="onCiudadChange($event)" 
               placeholder="Ej: Medellín o Bello" 
-              class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+              size="sm"
+            ></app-input>
           </div>
 
           <!-- Filtro por Comuna -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Comuna (ABAC)</label>
-            <input 
-              type="text" 
-              [(ngModel)]="filters.comuna" 
-              (ngModelChange)="applyFilters()" 
+            <app-input 
+              [value]="filters.comuna || ''" 
+              (inputChange)="onComunaChange($event)" 
               placeholder="Ej: Comuna 10, Comuna 4" 
-              class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+              size="sm"
+            ></app-input>
           </div>
 
           <!-- Filtro por Estado -->
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Estado</label>
-            <select 
-              [(ngModel)]="filters.estado" 
-              (ngModelChange)="applyFilters()" 
-              class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg outline-none bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
-              <option value="">Todos los Estados</option>
-              <option value="ACTIVO">ACTIVO</option>
-              <option value="INACTIVO">INACTIVO</option>
-              <option value="BLOQUEADO">BLOQUEADO</option>
-            </select>
+            <app-select 
+              label="Estado"
+              [value]="filters.estado || ''" 
+              [options]="estadoFilterOptions"
+              placeholder="Todos los Estados"
+              (changed)="onEstadoChange($event)"
+            ></app-select>
           </div>
         </div>
       </div>
 
-      <!-- Tabla de Datos -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <!-- Tabla de Datos con Estándar Design System -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
-              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
-                <th class="py-3 px-4">Usuario</th>
-                <th class="py-3 px-4">Rol Asignado</th>
-                <th class="py-3 px-4">Ámbito Territorial (ABAC Scope)</th>
-                <th class="py-3 px-4">Estado</th>
-                <th class="py-3 px-4 text-right">Acciones</th>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                <th class="py-3.5 px-4">Usuario</th>
+                <th class="py-3.5 px-4">Rol Asignado</th>
+                <th class="py-3.5 px-4">Ámbito Territorial (ABAC Scope)</th>
+                <th class="py-3.5 px-4">Estado</th>
+                <th class="py-3.5 px-4 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr *ngFor="let u of filteredUsers" class="hover:bg-slate-50/60 transition">
                 
-                <!-- Identidad -->
+                <!-- Identidad con Avatar Reutilizable -->
                 <td class="py-3 px-4">
                   <div class="flex items-center gap-3">
-                    <div class="h-8 w-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs flex-shrink-0">
-                      {{ getInitials(u) }}
-                    </div>
+                    <app-avatar [initials]="getInitials(u)" size="md"></app-avatar>
                     <div>
-                      <div class="font-semibold text-slate-800">{{ u.nombres }} {{ u.apellidos }}</div>
-                      <div class="text-slate-400 text-[11px]">{{ u.email }}</div>
+                      <div class="font-semibold text-slate-800 text-xs sm:text-sm">{{ u.nombres }} {{ u.apellidos }}</div>
+                      <div class="text-slate-400 text-[11px] font-mono">{{ u.email }}</div>
                     </div>
                   </div>
                 </td>
 
-                <!-- Rol -->
+                <!-- Rol con Badge Reutilizable -->
                 <td class="py-3 px-4">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-md font-medium text-[11px] bg-slate-100 text-slate-700">
+                  <app-badge variant="neutral" size="sm">
                     {{ u.rolNombre || u.rolId }}
-                  </span>
+                  </app-badge>
                 </td>
 
                 <!-- Scope Territorial -->
                 <td class="py-3 px-4">
                   <div class="flex flex-col gap-1">
-                    <div class="font-medium text-slate-700">
+                    <div class="font-medium text-slate-700 text-xs">
                       {{ u.scope.ciudad }}, {{ u.scope.departamento }}
                     </div>
                     <div class="flex flex-wrap gap-1">
                       <ng-container *ngIf="u.scope.comunas.includes('*'); else comunasTags">
-                        <span class="px-1.5 py-0.5 rounded text-[10px] bg-sky-50 text-sky-700 border border-sky-200">
+                        <app-badge variant="brand" size="sm">
                           Todas las Comunas (*)
-                        </span>
+                        </app-badge>
                       </ng-container>
                       <ng-template #comunasTags>
-                        <span 
+                        <app-badge 
                           *ngFor="let c of u.scope.comunas" 
-                          class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 border border-slate-200">
+                          variant="neutral" 
+                          size="sm"
+                        >
                           {{ c }}
-                        </span>
+                        </app-badge>
                       </ng-template>
                     </div>
                   </div>
                 </td>
 
-                <!-- Estado -->
+                <!-- Estado con Badge Reutilizable y Dot -->
                 <td class="py-3 px-4">
-                  <span [ngClass]="{
-                    'bg-emerald-50 text-emerald-700 border-emerald-200': u.estado === 'ACTIVO',
-                    'bg-amber-50 text-amber-700 border-amber-200': u.estado === 'INACTIVO',
-                    'bg-rose-50 text-rose-700 border-rose-200': u.estado === 'BLOQUEADO'
-                  }" class="inline-flex items-center px-2 py-0.5 rounded-full font-semibold border text-[11px]">
+                  <app-badge [variant]="getEstadoVariant(u.estado)" [dot]="true" size="sm">
                     {{ u.estado }}
-                  </span>
+                  </app-badge>
                 </td>
 
-                <!-- Acciones Guarded by Directives -->
+                <!-- Acciones con Botones e Íconos Atómicos -->
                 <td class="py-3 px-4 text-right">
-                  <div class="inline-flex items-center gap-2">
-                    <button 
+                  <div class="inline-flex items-center gap-1">
+                    <app-button 
                       *hasPermission="'USER_EDIT'"
-                      (click)="openEditModal(u)" 
+                      variant="ghost" 
+                      size="icon"
+                      (clicked)="openEditModal(u)" 
                       title="Editar usuario y alcance"
-                      class="p-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
+                    >
+                      <app-icon name="edit" size="sm" class="text-slate-500 hover:text-brand-600"></app-icon>
+                    </app-button>
 
-                    <button 
+                    <app-button 
                       *hasPermission="'USER_DELETE'"
-                      (click)="deleteUser(u)" 
+                      variant="ghost" 
+                      size="icon"
+                      (clicked)="promptDeleteUser(u)" 
                       title="Eliminar usuario"
-                      class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    >
+                      <app-icon name="trash" size="sm" class="text-slate-400 hover:text-rose-600"></app-icon>
+                    </app-button>
                   </div>
                 </td>
               </tr>
 
-              <!-- Fila vacía cuando no hay coincidencias -->
+              <!-- Fila vacía con EmptyStateCardComponent Reutilizable -->
               <tr *ngIf="filteredUsers.length === 0">
-                <td colspan="5" class="py-12 text-center text-slate-400">
-                  <div class="flex flex-col items-center justify-center">
-                    <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                    <p class="text-sm font-medium text-slate-600">No se encontraron usuarios</p>
-                    <p class="text-xs text-slate-400 mt-0.5">Prueba ajustando los criterios de los filtros superiores.</p>
-                  </div>
+                <td colspan="5" class="py-8 px-4 text-center">
+                  <app-empty-state-card
+                    iconName="search"
+                    title="No se encontraron usuarios"
+                    description="Prueba ajustando los criterios de los filtros de búsqueda superiores."
+                  >
+                    <app-button 
+                      *ngIf="hasActiveFilters()" 
+                      variant="outline" 
+                      size="sm" 
+                      (clicked)="resetFilters()"
+                    >
+                      <span>Restablecer Filtros</span>
+                    </app-button>
+                  </app-empty-state-card>
                 </td>
               </tr>
             </tbody>
@@ -259,18 +309,45 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
         (close)="showModal = false"
         (onSaved)="handleSave($event)">
       </app-user-form-modal>
+
+      <!-- Modal de Confirmación Estilizado Reutilizable -->
+      <app-confirm-modal
+        [(isOpen)]="showDeleteConfirm"
+        title="Eliminar Usuario"
+        [message]="deleteConfirmMessage"
+        confirmText="Eliminar"
+        variant="danger"
+        [loading]="deleting"
+        (confirmed)="confirmDeleteUser()"
+        (cancelled)="cancelDelete()"
+      ></app-confirm-modal>
+
     </div>
   `
 })
 export class UserListComponent implements OnInit {
   private userService = inject(UserService);
+  private toastService = inject(ToastService);
 
   users: User[] = [];
   filteredUsers: User[] = [];
   filters: UserFilter = { ciudad: '', comuna: '', estado: '', search: '' };
 
+  estadoFilterOptions: SelectOption[] = [
+    { label: 'Todos los Estados', value: '' },
+    { label: 'ACTIVO', value: 'ACTIVO' },
+    { label: 'INACTIVO', value: 'INACTIVO' },
+    { label: 'BLOQUEADO', value: 'BLOQUEADO' }
+  ];
+
   showModal = false;
   selectedUser: User | null = null;
+
+  // Confirm delete modal state
+  showDeleteConfirm = false;
+  userToDelete: User | null = null;
+  deleteConfirmMessage = '';
+  deleting = false;
 
   ngOnInit() {
     this.loadUsers();
@@ -306,6 +383,26 @@ export class UserListComponent implements OnInit {
     });
   }
 
+  onSearchChange(search: string) {
+    this.filters.search = search;
+    this.applyFilters();
+  }
+
+  onCiudadChange(ciudad: string) {
+    this.filters.ciudad = ciudad;
+    this.applyFilters();
+  }
+
+  onComunaChange(comuna: string) {
+    this.filters.comuna = comuna;
+    this.applyFilters();
+  }
+
+  onEstadoChange(estado: any) {
+    this.filters.estado = estado;
+    this.applyFilters();
+  }
+
   hasActiveFilters(): boolean {
     return !!(this.filters.search || this.filters.ciudad || this.filters.comuna || this.filters.estado);
   }
@@ -317,6 +414,19 @@ export class UserListComponent implements OnInit {
 
   countByState(state: string): number {
     return this.users.filter(u => u.estado === state).length;
+  }
+
+  getEstadoVariant(estado: string): BadgeVariant {
+    switch (estado) {
+      case 'ACTIVO':
+        return 'success';
+      case 'INACTIVO':
+        return 'warning';
+      case 'BLOQUEADO':
+        return 'danger';
+      default:
+        return 'neutral';
+    }
   }
 
   getInitials(u: User): string {
@@ -336,21 +446,45 @@ export class UserListComponent implements OnInit {
   }
 
   async handleSave(userData: Partial<User>) {
-    if (this.selectedUser?.id) {
-      await this.userService.updateUser(this.selectedUser.id, userData);
-    } else {
-      await this.userService.createUser(userData as Omit<User, 'id'>);
+    try {
+      if (this.selectedUser?.id) {
+        await this.userService.updateUser(this.selectedUser.id, userData);
+        this.toastService.success('Usuario actualizado', `${userData.nombres || 'El usuario'} ha sido modificado con éxito.`);
+      } else {
+        await this.userService.createUser(userData as Omit<User, 'id'>);
+        this.toastService.success('Usuario creado', `${userData.nombres || 'El nuevo usuario'} ha sido registrado.`);
+      }
+      this.showModal = false;
+      this.loadUsers();
+    } catch {
+      this.toastService.error('Error', 'No fue posible guardar el usuario.');
     }
-    this.showModal = false;
-    this.loadUsers();
   }
 
-  async deleteUser(user: User) {
-    if (confirm(`¿Estás seguro de eliminar al usuario ${user.nombres} ${user.apellidos}?`)) {
-      if (user.id) {
-        await this.userService.deleteUser(user.id);
-      }
+  promptDeleteUser(user: User) {
+    this.userToDelete = user;
+    this.deleteConfirmMessage = `¿Estás seguro de que deseas eliminar permanentemente a ${user.nombres} ${user.apellidos}? Esta acción no se puede deshacer.`;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.userToDelete = null;
+  }
+
+  async confirmDeleteUser() {
+    if (!this.userToDelete?.id) return;
+    this.deleting = true;
+    try {
+      await this.userService.deleteUser(this.userToDelete.id);
+      this.toastService.success('Usuario eliminado', 'El usuario fue eliminado del directorio.');
+      this.showDeleteConfirm = false;
+      this.userToDelete = null;
       this.loadUsers();
+    } catch {
+      this.toastService.error('Error', 'No se pudo eliminar el usuario.');
+    } finally {
+      this.deleting = false;
     }
   }
 }

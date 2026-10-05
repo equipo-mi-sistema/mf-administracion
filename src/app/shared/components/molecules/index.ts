@@ -9,3 +9,5 @@ export * from './dropdown.component';
 export * from './breadcrumb.component';
 export * from './pagination.component';
 export * from './tooltip.component';
+export * from './login-header.component';
+export * from './security-disclaimer.component';

@@ -9,3 +9,6 @@ export * from './spinner.component';
 export * from './toggle.component';
 export * from './skeleton.component';
 export * from './divider.component';
+export * from './brand-logo.component';
+export * from './google-button.component';
+export * from './typography.component';
