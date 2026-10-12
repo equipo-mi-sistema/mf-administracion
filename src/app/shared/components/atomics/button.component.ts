@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 @Component({
@@ -30,7 +30,7 @@ export class ButtonComponent {
   clicked = output<MouseEvent>();
 
   buttonClasses = computed(() => {
-    const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-fast ease-smooth focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none';
+    const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-fast ease-smooth focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer';
 
     const sizeMap: Record<ButtonSize, string> = {
       sm: 'px-2.5 py-1.5 text-xs gap-1.5',
@@ -43,7 +43,8 @@ export class ButtonComponent {
       primary: 'bg-brand-600 text-white hover:bg-brand-700 shadow-subtle hover:shadow-card active:bg-brand-800 active:scale-[0.98]',
       secondary: 'bg-surface-100 text-surface-700 hover:bg-surface-200 active:bg-surface-300',
       outline: 'border border-surface-300 bg-white text-surface-700 hover:bg-surface-50 active:bg-surface-100',
-      ghost: 'text-surface-600 hover:bg-surface-100 hover:text-surface-900 active:bg-surface-200'
+      ghost: 'text-surface-600 hover:bg-surface-100 hover:text-surface-900 active:bg-surface-200',
+      danger: 'bg-red-600 text-white hover:bg-red-700 shadow-subtle hover:shadow-card active:bg-red-800 active:scale-[0.98]'
     };
 
     return `${base} ${sizeMap[this.size()]} ${variantMap[this.variant()]}`;

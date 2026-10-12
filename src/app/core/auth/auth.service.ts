@@ -27,7 +27,20 @@ export class AuthService {
   // Computed signals
   readonly isAuthenticated = computed(() => !!this.currentUser());
   readonly userClaims = computed<CustomUserClaims>(() => this.currentUser()?.claims ?? {});
-  readonly userRoles = computed<string[]>(() => this.currentUser()?.claims.roles ?? []);
+  readonly userRoleId = computed<string | null>(() => this.currentUser()?.role_id ?? this.currentUser()?.roleId ?? null);
+  readonly userTeamId = computed<string | null>(() => this.currentUser()?.team_id ?? this.currentUser()?.teamId ?? null);
+  readonly userRoles = computed<string[]>(() => {
+    const roles = (this.currentUser()?.claims.roles as string[]) || [];
+    const roleId = this.userRoleId();
+    if (roleId && !roles.includes(roleId)) {
+      return [roleId, ...roles];
+    }
+    return roles;
+  });
+  readonly isSuperAdmin = computed<boolean>(() => {
+    const roleId = this.userRoleId();
+    return roleId === 'SUPER_ADMIN' || this.userRoles().includes('SUPER_ADMIN');
+  });
   readonly userModules = computed<string[]>(() => this.currentUser()?.claims.modules ?? []);
   readonly userScope = computed<string>(() => this.currentUser()?.claims.scope ?? '');
 
@@ -49,14 +62,22 @@ export class AuthService {
         try {
           const tokenResult = await getIdTokenResult(firebaseUser, false);
           const claims = (tokenResult.claims || {}) as CustomUserClaims;
+          const roleId = (claims.role_id || (claims.roles && claims.roles[0]) || null) as string | null;
+          const teamId = (claims.team_id || null) as string | null;
 
           this.currentUser.set({
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName,
             photoURL: firebaseUser.photoURL,
+            roleId,
+            role_id: roleId,
+            teamId,
+            team_id: teamId,
             claims: {
-              roles: (claims['roles'] as string[]) || [],
+              role_id: roleId || undefined,
+              team_id: teamId || undefined,
+              roles: (claims['roles'] as string[]) || (roleId ? [roleId] : []),
               modules: (claims['modules'] as string[]) || [],
               scope: (claims['scope'] as string) || '',
               ...claims
@@ -87,14 +108,22 @@ export class AuthService {
       const credential = await signInWithPopup(this.auth, provider);
       const tokenResult = await getIdTokenResult(credential.user, true);
       const claims = (tokenResult.claims || {}) as CustomUserClaims;
+      const roleId = (claims.role_id || (claims.roles && claims.roles[0]) || null) as string | null;
+      const teamId = (claims.team_id || null) as string | null;
 
       const appUser: AppUser = {
         uid: credential.user.uid,
         email: credential.user.email,
         displayName: credential.user.displayName,
         photoURL: credential.user.photoURL,
+        roleId,
+        role_id: roleId,
+        teamId,
+        team_id: teamId,
         claims: {
-          roles: (claims['roles'] as string[]) || [],
+          role_id: roleId || undefined,
+          team_id: teamId || undefined,
+          roles: (claims['roles'] as string[]) || (roleId ? [roleId] : []),
           modules: (claims['modules'] as string[]) || [],
           scope: (claims['scope'] as string) || '',
           ...claims

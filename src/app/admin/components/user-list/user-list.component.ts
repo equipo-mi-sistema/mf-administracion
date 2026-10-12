@@ -224,17 +224,17 @@ import { ToastService } from '../../../shared/components/organism/toast';
                 <td class="py-3 px-4">
                   <div class="flex flex-col gap-1">
                     <div class="font-medium text-slate-700 text-xs">
-                      {{ u.scope.ciudad }}, {{ u.scope.departamento }}
+                      {{ u.scope?.ciudad || 'General' }}, {{ u.scope?.departamento || '' }}
                     </div>
                     <div class="flex flex-wrap gap-1">
-                      <ng-container *ngIf="u.scope.comunas.includes('*'); else comunasTags">
+                      <ng-container *ngIf="u.scope?.comunas?.includes('*'); else comunasTags">
                         <app-badge variant="brand" size="sm">
                           Todas las Comunas (*)
                         </app-badge>
                       </ng-container>
                       <ng-template #comunasTags>
                         <app-badge 
-                          *ngFor="let c of u.scope.comunas" 
+                          *ngFor="let c of (u.scope?.comunas || [])" 
                           variant="neutral" 
                           size="sm"
                         >
@@ -247,8 +247,8 @@ import { ToastService } from '../../../shared/components/organism/toast';
 
                 <!-- Estado con Badge Reutilizable y Dot -->
                 <td class="py-3 px-4">
-                  <app-badge [variant]="getEstadoVariant(u.estado)" [dot]="true" size="sm">
-                    {{ u.estado }}
+                  <app-badge [variant]="getEstadoVariant(u.estado || 'ACTIVO')" [dot]="true" size="sm">
+                    {{ u.estado || u.status || 'ACTIVO' }}
                   </app-badge>
                 </td>
 

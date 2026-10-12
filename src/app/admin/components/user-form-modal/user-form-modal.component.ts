@@ -235,8 +235,8 @@ export class UserFormModalComponent implements OnInit {
     this.roleService.getRoles().subscribe(r => {
       this.roles = r;
       this.roleOptions = r.map(role => ({
-        label: role.nombre,
-        value: role.id
+        label: role.role_name || role.nombre || 'Rol',
+        value: role.role_id || role.id || ''
       }));
     });
 

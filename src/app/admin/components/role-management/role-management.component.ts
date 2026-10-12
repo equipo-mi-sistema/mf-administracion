@@ -103,7 +103,7 @@ import { ToastService } from '../../../shared/components/organism/toast';
                 <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{{ r.descripcion }}</p>
                 <div class="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-brand-600">
                   <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
-                  <span>{{ r.permisos.length }} permisos concedidos</span>
+                  <span>{{ r.permisos?.length || 0 }} permisos concedidos</span>
                 </div>
               </div>
             </div>
@@ -287,7 +287,7 @@ export class RoleManagementComponent implements OnInit {
 
   selectRole(role: Role) {
     this.selectedRole = role;
-    this.activePermCodes = [...role.permisos];
+    this.activePermCodes = role.permisos ? [...role.permisos] : [];
   }
 
   isPermChecked(code: string): boolean {
@@ -316,7 +316,7 @@ export class RoleManagementComponent implements OnInit {
 
   isChanged(): boolean {
     if (!this.selectedRole) return false;
-    const original = [...this.selectedRole.permisos].sort().join(',');
+    const original = [...(this.selectedRole.permisos || [])].sort().join(',');
     const current = [...this.activePermCodes].sort().join(',');
     return original !== current;
   }

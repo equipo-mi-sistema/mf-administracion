@@ -22,9 +22,19 @@
 4. **Auditoría Inmutable con Trazabilidad IP**:
    - Toda acción administrativa sensible (creación de equipo, cambio de rol, desactivación de usuario, transferencia de liderazgo, alteración de kill-switch) DEBE generar un registro inmutable que incluya la dirección IP (`ip_address`) y agente de usuario del ejecutor.
 
+5. **Consumo de Singleton de Autenticación (`@sistema/auth`)**:
+   - `administracion` no reinicializa Firebase Auth de forma independiente ni duplica `initializeApp()`. Consume la instancia y el token de sesión como Singleton a través del core de `@sistema/auth` provisto por el Shell Host vía Native Federation.
+
+6. **Gobernanza del "Kill-Switch" de Microfrontends**:
+   - `administracion` es la única microapp autorizada para gestionar la disponibilidad (`active: boolean`) en `/config/microfrontends/{microfrontend_id}`, disparando eventos de auditoría obligatorios y bloqueos perimetrales inmediatos.
+
+7. **Estándar de Estilos Oficial (CSS Puro)**:
+   - El estándar transversal es **CSS plano (`src/styles.css`)** con Tailwind CSS v3.4+. No se utilizan preprocesadores Sass (`.scss`) para mantener consistencia con el Shell Host y optimizar tiempos de compilación.
+
 ---
 
 ## 3. Estructura de Directorios
+
 El repositorio sigue la arquitectura canónica en Angular 20:
 
 ```text
@@ -32,24 +42,28 @@ administracion/
 ├── src/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── auth/           # Integración con @sistema/auth
-│   │   │   ├── guards/         # AdminGuard, TeamOwnerGuard
-│   │   │   ├── models/         # Role, Team, Member, Invitation, AuditLog Interfaces
-│   │   │   └── services/       # AdminService, RoleService, AuditService
+│   │   │   ├── auth/           # Integración con Singleton @sistema/auth
+│   │   │   ├── guards/         # AdminGuard (SUPER_ADMIN), TeamOwnerGuard
+│   │   │   ├── models/         # Role, Team, Member, Invitation, AuditLog, MicrofrontendConfig Interfaces
+│   │   │   └── services/       # AdminService, RoleService, AuditService, KillSwitchService
 │   │   ├── shared/
 │   │   │   └── components/     # Catálogo Atómico (atoms, molecules, organism)
-│   │   └── pages/
+│   │   ├── admin/              # Módulo Funcional y Rutas Expuestas ('./routes')
+│   │   └── pages/              # Vistas Standalone (organización flexible por dominio)
 │   │       ├── teams/          # TeamsPage, TeamDetailPage
-│   │       ├── roles/          # RolesManagerPage (Acordeón de Permisos)
+│   │       ├── roles/          # RolesManagerPage (Acordeón de Permisos por Microapp)
 │   │       ├── members/        # MemberListPage, MemberInviteModalPage
+│   │       ├── kill-switch/    # MicrofrontendsManagerPage
 │   │       └── audit/          # AuditLogsPage
 │   ├── environments/
-│   ├── styles.css
+│   ├── styles.css              # Directivas oficiales CSS de Tailwind
 │   ├── tailwind.config.js
 │   └── federation.config.js
-└── spec/
-    ├── CONSTITUTION.md
-    ├── SPEC.md
-    ├── PLAN.md
-    ├── TASKS.md
-    └── openapi.yaml
+├── CONSTITUTION.md
+├── SPEC.md
+├── PLAN.md
+└── TASKS.md
+```
+
+> [!NOTE] Autonomía de Estructura de Pantallas
+> La organización interna de vistas (bajo `src/app/pages/` o expuesta a través de subdirectorios modulares como `src/app/admin/`) es autónoma y se adapta a la complejidad de la gestión administrativa, garantizando siempre la exposición limpia de rutas mediante `federation.config.js`.

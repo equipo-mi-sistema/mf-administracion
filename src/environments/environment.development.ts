@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  hostBaseUrl: 'http://localhost:4200',
   firebase: {
     apiKey: "AIzaSyBjvYnMBDXPq6roKvlYuf6HAP5Bjv9NF44",
     authDomain: "mi-sisema.firebaseapp.com",

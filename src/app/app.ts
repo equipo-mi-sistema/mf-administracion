@@ -7,7 +7,7 @@ import { ToastContainerComponent } from './shared/components/organism/toast';
   standalone: true,
   imports: [RouterOutlet, ToastContainerComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.css'
 })
 export class App {
   protected readonly title = signal('sistema-administracion');
