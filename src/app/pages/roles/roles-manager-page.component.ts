@@ -45,14 +45,14 @@ import { ToastService } from '../../shared/components/organism/toast';
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Gobernanza de Roles y Permisos (RBAC)</h1>
-            <app-badge variant="brand" size="sm">Ecosistema Polyrepo</app-badge>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Gestión de Roles y Permisos</h1>
+            <app-badge variant="brand" size="sm">Seguridad y Acceso</app-badge>
             @if (!isSuperAdmin()) {
               <app-badge variant="neutral" size="sm">Solo Lectura</app-badge>
             }
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Matriz de permisos segmentada por microaplicación para gobernar el acceso perimetral.
+            Matriz de permisos organizada por módulo para coordinar las facultades de los colaboradores.
           </p>
         </div>
 
@@ -71,7 +71,7 @@ import { ToastService } from '../../shared/components/organism/toast';
               (clicked)="openNewRoleDialog()"
             >
               <app-icon name="plus" size="sm"></app-icon>
-              <span>Crear Rol Global</span>
+              <span>Crear Rol</span>
             </app-button>
           }
         </div>
@@ -200,7 +200,7 @@ import { ToastService } from '../../shared/components/organism/toast';
             <app-empty-state-card
               iconName="shield"
               title="Selecciona un rol para ver su matriz"
-              description="Podrás inspeccionar el acordeón de microapps y conmutar permisos atómicos en tiempo real."
+              description="Podrás consultar las opciones por módulo y gestionar los permisos en tiempo real."
             ></app-empty-state-card>
           }
         </div>
@@ -210,12 +210,12 @@ import { ToastService } from '../../shared/components/organism/toast';
       <!-- Modal Crear Nuevo Rol -->
       <app-modal
         [(isOpen)]="showNewRoleModal"
-        title="Crear Nuevo Rol Global"
+        title="Crear Nuevo Rol"
         size="md"
         (closed)="showNewRoleModal = false"
       >
         <p class="text-xs text-slate-500 -mt-2 mb-4">
-          Define el identificador y propósito del nuevo rol antes de configurar su matriz en el acordeón.
+          Define el nombre y propósito del nuevo rol antes de configurar sus permisos por módulo.
         </p>
 
         <div class="space-y-4">

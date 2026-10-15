@@ -15,7 +15,7 @@ import { AuthService } from '../auth/auth.service';
 const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
   {
     id: 'administracion',
-    name: 'Administración y Gobernanza',
+    name: 'Administración y Equipos',
     routePath: 'administracion',
     remoteEntry: 'http://localhost:4201/remoteEntry.json',
     exposedModule: './routes',
@@ -23,11 +23,11 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN'],
     icon: 'shield',
     order: 1,
-    badge: 'Core'
+    badge: 'Gestión y Equipos'
   },
   {
     id: 'mapeo',
-    name: 'Mapeo Territorial y Red Electoral',
+    name: 'Mapeo Territorial y Votantes',
     routePath: 'mapeo',
     remoteEntry: 'http://localhost:4202/remoteEntry.json',
     exposedModule: './routes',
@@ -35,11 +35,11 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN', 'TEAM_OWNER', 'MEMBER'],
     icon: 'map',
     order: 2,
-    badge: 'Territorio'
+    badge: 'Mapeo Territorial'
   },
   {
     id: 'gestion',
-    name: 'Gestión y Casos Ciudadanos v2',
+    name: 'Atención y Casos Ciudadanos',
     routePath: 'gestion',
     remoteEntry: 'http://localhost:4203/remoteEntry.json',
     exposedModule: './routes',
@@ -47,11 +47,11 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN', 'TEAM_OWNER', 'MEMBER'],
     icon: 'users',
     order: 3,
-    badge: 'Atención'
+    badge: 'Atención Ciudadana'
   },
   {
     id: 'asistencia',
-    name: 'Asistencia y Control de Eventos',
+    name: 'Registro y Control de Asistencia',
     routePath: 'asistencia',
     remoteEntry: 'http://localhost:4204/remoteEntry.json',
     exposedModule: './routes',
@@ -59,11 +59,11 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN', 'TEAM_OWNER', 'MEMBER'],
     icon: 'calendar',
     order: 4,
-    badge: 'Eventos'
+    badge: 'Eventos y Asistencia'
   },
   {
     id: 'transporte',
-    name: 'Logística y Rastreo GPS PWA',
+    name: 'Logística y Transporte de Campo',
     routePath: 'transporte',
     remoteEntry: 'http://localhost:4205/remoteEntry.json',
     exposedModule: './routes',
@@ -71,11 +71,11 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN', 'TEAM_OWNER', 'MEMBER'],
     icon: 'truck',
     order: 5,
-    badge: 'Logística'
+    badge: 'Logística y Móviles'
   },
   {
     id: 'conteo',
-    name: 'Testigos Electorales y Escrutinio E-14',
+    name: 'Escrutinio y Actas E-14',
     routePath: 'conteo',
     remoteEntry: 'http://localhost:4206/remoteEntry.json',
     exposedModule: './routes',
@@ -83,7 +83,7 @@ const INITIAL_MICROFRONTENDS: MicrofrontendConfig[] = [
     rolesAllowed: ['SUPER_ADMIN', 'TEAM_OWNER', 'MEMBER'],
     icon: 'chart',
     order: 6,
-    badge: 'Escrutinio'
+    badge: 'Escrutinio E-14'
   }
 ];
 

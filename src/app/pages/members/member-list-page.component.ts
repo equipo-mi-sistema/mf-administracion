@@ -37,10 +37,10 @@ import { ToastService } from '../../shared/components/organism/toast';
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Directorio de Miembros y Usuarios</h1>
-            <app-badge variant="brand" size="sm">Gobernanza /users</app-badge>
+            <app-badge variant="brand" size="sm">Directorio Activo</app-badge>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Control de cuentas activas, cargos funcionales y el <span class="text-red-600 font-semibold">Botón Rojo</span> de expulsión en tiempo real.
+            Control de cuentas activas, cargos funcionales y revocación de acceso en tiempo real.
           </p>
         </div>
 
@@ -95,11 +95,11 @@ import { ToastService } from '../../shared/components/organism/toast';
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
                 <th class="p-3.5 pl-5">Miembro</th>
-                <th class="p-3.5">Rol Técnico</th>
+                <th class="p-3.5">Rol Asignado</th>
                 <th class="p-3.5">Equipo Asignado</th>
                 <th class="p-3.5">Cargo Funcional</th>
                 <th class="p-3.5">Estado</th>
-                <th class="p-3.5 pr-5 text-right">Acción (Botón Rojo)</th>
+                <th class="p-3.5 pr-5 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -147,10 +147,10 @@ import { ToastService } from '../../shared/components/organism/toast';
                         variant="danger" 
                         size="sm"
                         (clicked)="promptDeactivateUser(user)"
-                        title="Desactivar sesión y forzar expulsión inmediata en el Host"
+                        title="Desactivar usuario y revocar su acceso inmediatamente"
                       >
                         <app-icon name="trash" size="sm"></app-icon>
-                        <span>Expulsar</span>
+                        <span>Desactivar</span>
                       </app-button>
                     } @else {
                       <app-button 
@@ -176,12 +176,12 @@ import { ToastService } from '../../shared/components/organism/toast';
         </div>
       </div>
 
-      <!-- Modal de Confirmación: Botón Rojo de Expulsión -->
+      <!-- Modal de Confirmación: Desactivar Usuario -->
       <app-confirm-modal
         [(isOpen)]="showDeactivateConfirmModal"
-        title="¿Expulsar y Desactivar Miembro?"
+        title="¿Desactivar acceso del usuario?"
         [message]="deactivateMessage"
-        confirmText="Confirmar Expulsión"
+        confirmText="Desactivar Acceso"
         confirmVariant="danger"
         (confirmed)="confirmDeactivate()"
         (cancelled)="showDeactivateConfirmModal = false"
@@ -269,7 +269,7 @@ export class MemberListPageComponent implements OnInit {
   promptDeactivateUser(user: User): void {
     this.userToDeactivate = user;
     const name = user.displayName || user.nombres || user.email;
-    this.deactivateMessage = `Esta acción cambiará el estado de ${name} a INACTIVE en Firestore. El Host detectará el cambio de inmediato mediante su listener onSnapshot y expulsará su sesión de todas las pestañas abiertas.`;
+    this.deactivateMessage = `Esta acción desactivará la cuenta de ${name} y revocará su acceso al sistema de forma inmediata.`;
     this.showDeactivateConfirmModal = true;
   }
 
@@ -281,7 +281,7 @@ export class MemberListPageComponent implements OnInit {
     try {
       await this.userService.deactivateUser(uid);
       this.showDeactivateConfirmModal = false;
-      this.toastService.success('Usuario Inhabilitado', 'Se aplicó la expulsión Zero-Trust en tiempo real.');
+      this.toastService.success('Usuario Desactivado', 'El acceso del usuario ha sido revocado correctamente.');
       this.loadData();
     } catch (err: any) {
       this.toastService.error('Error', err?.message || 'No fue posible inhabilitar el usuario.');

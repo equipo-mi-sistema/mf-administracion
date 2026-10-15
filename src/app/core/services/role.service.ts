@@ -32,7 +32,7 @@ export const ECOSYSTEM_MICROAPPS: MicroappDefinition[] = [
       { code: 'users:manage', label: 'Gestión de Usuarios', description: 'Crear, editar y desactivar miembros del equipo' },
       { code: 'roles:manage', label: 'Gestión de Roles', description: 'Crear roles y configurar la matriz de permisos globales' },
       { code: 'audit:view', label: 'Visualización de Auditoría', description: 'Consultar logs inmutables con trazabilidad IP' },
-      { code: 'killswitch:manage', label: 'Gobernanza Kill-Switch', description: 'Activar o suspender microfrontends en tiempo real' }
+      { code: 'killswitch:manage', label: 'Disponibilidad de Módulos', description: 'Habilitar o pausar módulos del sistema en tiempo real' }
     ]
   },
   {

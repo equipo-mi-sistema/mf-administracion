@@ -38,11 +38,11 @@ import { ToastService } from '../../shared/components/organism/toast';
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Gobernanza de Equipos Territoriales</h1>
-            <app-badge variant="brand" size="sm">Aislamiento team_id</app-badge>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Gestión de Equipos Territoriales</h1>
+            <app-badge variant="brand" size="sm">Equipos Activos</app-badge>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Gestión de inquilinos territoriales, dueños de equipo (<code class="text-brand-600 font-mono">leader_uid</code>) e invitaciones pre-aprobadas.
+            Gestión de equipos territoriales, líderes coordinadores e invitaciones de nuevos colaboradores.
           </p>
         </div>
 
@@ -72,18 +72,18 @@ import { ToastService } from '../../shared/components/organism/toast';
                   </div>
                   <div>
                     <h3 class="font-bold text-slate-900 text-sm leading-snug">{{ team.team_name }}</h3>
-                    <code class="text-[10px] text-slate-400 font-mono">{{ team.team_id || team.id }}</code>
+                    <span class="text-[11px] text-slate-400">Territorio asignado</span>
                   </div>
                 </div>
-                <app-badge variant="brand" size="sm">Inquilino</app-badge>
+                <app-badge variant="brand" size="sm">Activo</app-badge>
               </div>
 
               <!-- Detalle de Liderazgo -->
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5 my-3">
-                <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Dueño del Equipo (Leader)</div>
+                <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Líder de Equipo</div>
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-bold text-slate-800">{{ team.leader_name || team.leader_email || team.leader_uid }}</span>
-                  <span class="text-[10px] text-slate-400 font-mono">UID: {{ team.leader_uid }}</span>
+                  <span class="text-[10px] text-slate-400 font-medium">Coordinador</span>
                 </div>
               </div>
             </div>
@@ -128,8 +128,8 @@ import { ToastService } from '../../shared/components/organism/toast';
       <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5 mt-6">
         <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
           <div>
-            <h3 class="text-sm font-bold text-slate-900">Invitaciones Pre-aprobadas en Tránsito (/invitations)</h3>
-            <p class="text-xs text-slate-500">Al autenticarse con Google, la Cloud Function les inyectará el rol y equipo.</p>
+            <h3 class="text-sm font-bold text-slate-900">Invitaciones Pendientes de Aceptación</h3>
+            <p class="text-xs text-slate-500">Al iniciar sesión con Google por primera vez, se activará automáticamente el acceso del colaborador a su equipo asignado.</p>
           </div>
           <app-badge variant="neutral" size="sm">{{ invitations.length }} registradas</app-badge>
         </div>
@@ -213,11 +213,11 @@ import { ToastService } from '../../shared/components/organism/toast';
       >
         <div class="space-y-4">
           <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
-            <strong>Atención:</strong> La transferencia de liderazgo reasigna la propiedad territorial en Firestore (<code class="font-mono">leader_uid</code>) sin alterar el historial ni llaves foráneas en SQL.
+            <strong>Atención:</strong> La transferencia de liderazgo reasigna la coordinación del equipo al nuevo responsable seleccionado sin alterar los registros históricos del equipo.
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Seleccionar Nuevo Dueño de Equipo *</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Seleccionar Nuevo Líder de Equipo *</label>
             <select 
               [(ngModel)]="transferNewLeaderUid"
               class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">

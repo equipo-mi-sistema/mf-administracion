@@ -1,6 +1,9 @@
+const isLocalEnv = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export const environment = {
-  production: false,
-  hostBaseUrl: 'http://localhost:4200',
+  production: true,
+  hostBaseUrl: isLocalEnv ? 'http://localhost:4200' : 'https://mi-sisema.web.app',
   firebase: {
     apiKey: 'AIzaSyBjvYnMBDXPq6roKvlYuf6HAP5Bjv9NF44',
     authDomain: 'mi-sisema.firebaseapp.com',

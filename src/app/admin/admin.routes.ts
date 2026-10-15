@@ -40,7 +40,7 @@ export const routes: Routes = [
           import('../pages/roles/roles-manager-page.component').then(
             (m) => m.RolesManagerPageComponent
           ),
-        title: 'Roles & Permisos Polyrepo | Administración'
+        title: 'Roles y Permisos | Administración'
       },
       {
         path: 'kill-switch',
@@ -48,7 +48,7 @@ export const routes: Routes = [
           import('../pages/kill-switch/microfrontends-manager-page.component').then(
             (m) => m.MicrofrontendsManagerPageComponent
           ),
-        title: 'Gobernanza Kill-Switch | Administración'
+        title: 'Disponibilidad de Módulos | Administración'
       },
       {
         path: 'audit',
@@ -56,7 +56,7 @@ export const routes: Routes = [
           import('../pages/audit/audit-logs-page.component').then(
             (m) => m.AuditLogsPage
           ),
-        title: 'Auditoría Inmutable | Administración'
+        title: 'Auditoría y Seguridad | Administración'
       }
     ]
   }

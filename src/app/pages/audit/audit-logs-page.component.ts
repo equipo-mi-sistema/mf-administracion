@@ -31,11 +31,11 @@ import {
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Auditoría Inmutable de Seguridad</h1>
-            <app-badge variant="brand" size="sm">Trazabilidad IP</app-badge>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Auditoría y Registro de Seguridad</h1>
+            <app-badge variant="brand" size="sm">Trazabilidad de Acceso</app-badge>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Registro cronológico inalterable de operaciones administrativas en <code class="font-mono text-brand-600">/audit_logs</code>.
+            Registro cronológico inalterable de operaciones administrativas y de seguridad en el sistema.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ import {
             (clicked)="refreshLogs()"
           >
             <app-icon name="refresh" size="sm"></app-icon>
-            <span>Actualizar Logs</span>
+            <span>Actualizar Registro</span>
           </app-button>
         </div>
       </div>
@@ -56,7 +56,7 @@ import {
         <div class="flex-1 w-full sm:w-auto">
           <app-input
             [(value)]="searchQuery"
-            placeholder="Buscar por ejecutor, IP o target_id..."
+            placeholder="Buscar por ejecutor, IP o identificador..."
             size="sm"
           ></app-input>
         </div>
@@ -66,15 +66,15 @@ import {
             [(ngModel)]="selectedActionFilter"
             class="text-xs bg-white border border-slate-300 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
             <option value="">Todas las Acciones</option>
-            <option value="ROLE_CREATE">ROLE_CREATE</option>
-            <option value="ROLE_UPDATE">ROLE_UPDATE</option>
-            <option value="ROLE_DELETE">ROLE_DELETE</option>
-            <option value="USER_DISABLE">USER_DISABLE (Botón Rojo)</option>
-            <option value="USER_ENABLE">USER_ENABLE</option>
-            <option value="TEAM_CREATE">TEAM_CREATE</option>
-            <option value="TEAM_TRANSFER">TEAM_TRANSFER</option>
-            <option value="KILL_SWITCH_TOGGLED">KILL_SWITCH_TOGGLED</option>
-            <option value="INVITATION_CREATE">INVITATION_CREATE</option>
+            <option value="ROLE_CREATE">ROLE_CREATE (Crear Rol)</option>
+            <option value="ROLE_UPDATE">ROLE_UPDATE (Actualizar Rol)</option>
+            <option value="ROLE_DELETE">ROLE_DELETE (Eliminar Rol)</option>
+            <option value="USER_DISABLE">USER_DISABLE (Desactivar Usuario)</option>
+            <option value="USER_ENABLE">USER_ENABLE (Reactivar Usuario)</option>
+            <option value="TEAM_CREATE">TEAM_CREATE (Crear Equipo)</option>
+            <option value="TEAM_TRANSFER">TEAM_TRANSFER (Transferir Liderazgo)</option>
+            <option value="KILL_SWITCH_TOGGLED">KILL_SWITCH_TOGGLED (Disponibilidad de Módulo)</option>
+            <option value="INVITATION_CREATE">INVITATION_CREATE (Invitar Miembro)</option>
           </select>
         </div>
       </div>
@@ -85,11 +85,11 @@ import {
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-                <th class="p-3.5 pl-5">Timestamp (UTC)</th>
+                <th class="p-3.5 pl-5">Fecha y Hora</th>
                 <th class="p-3.5">Acción</th>
                 <th class="p-3.5">Ejecutor</th>
                 <th class="p-3.5">Dirección IP</th>
-                <th class="p-3.5">Objetivo (Target ID)</th>
+                <th class="p-3.5">Elemento Afectado</th>
                 <th class="p-3.5 pr-5 text-right">Detalle de Estado</th>
               </tr>
             </thead>

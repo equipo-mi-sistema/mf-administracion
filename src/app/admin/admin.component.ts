@@ -34,15 +34,15 @@ import { AuthService } from '../core/auth/auth.service';
           routerLinkActive="bg-white text-brand-700 shadow-sm" 
           class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
           <app-icon name="shield" size="sm"></app-icon>
-          <span>Roles (RBAC)</span>
+          <span>Roles y Permisos</span>
         </a>
 
         <a 
           routerLink="kill-switch" 
           routerLinkActive="bg-white text-brand-700 shadow-sm" 
           class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
-          <app-icon name="extension" size="sm"></app-icon>
-          <span>Kill-Switch</span>
+          <app-icon name="settings" size="sm"></app-icon>
+          <span>Módulos del Sistema</span>
         </a>
 
         <a 

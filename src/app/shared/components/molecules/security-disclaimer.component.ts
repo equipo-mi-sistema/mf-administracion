@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
       </div>
       <div class="text-xs text-slate-500 leading-relaxed">
         <span class="font-semibold text-slate-700">Acceso institucional seguro.</span>
-        Solo las cuentas Google corporativas autorizadas y con roles asignados tendrán acceso a los microfrontends del sistema.
+        Solo las cuentas corporativas autorizadas y con roles asignados tendrán acceso a los módulos del sistema.
       </div>
     </div>
   `
